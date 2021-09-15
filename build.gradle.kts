@@ -1,7 +1,8 @@
 plugins {
     application
-    kotlin("jvm") version "1.4.21"
+    kotlin("jvm") version "1.4.31"
     id("com.justai.jaicf.jaicp-build-plugin") version "0.1.1"
+    kotlin("plugin.serialization") version "1.5.30"
 }
 
 group = "com.justai.jaicf"
@@ -24,8 +25,16 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.2")
+    implementation("com.just-ai.jaicf:mongo:$jaicf")
 
     implementation("ch.qos.logback:logback-classic:$logback")
+
+    implementation(platform("com.squareup.okhttp3:okhttp-bom:4.9.0"))
+    implementation("com.squareup.okhttp3:okhttp")
+    implementation("com.squareup.okhttp3:logging-interceptor")
+    implementation ("io.github.rburgst:okhttp-digest:2.5")
+    implementation ("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.+")
 
     implementation("com.just-ai.jaicf:core:$jaicf")
     implementation("com.just-ai.jaicf:jaicp:$jaicf")

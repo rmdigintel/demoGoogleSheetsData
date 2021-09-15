@@ -16,7 +16,7 @@ open class HttpBotChannelServlet(
     private val channel: HttpBotChannel
 ) : HttpServlet(), WithLogger {
 
-    override fun doPost(req: HttpServletRequest?, resp: HttpServletResponse?) {
+    override fun do`Post(req: HttpServletRequest?, resp: HttpServletResponse?) {
         req?.run {
             val request = HttpBotRequest(
                 stream = req.inputStream,

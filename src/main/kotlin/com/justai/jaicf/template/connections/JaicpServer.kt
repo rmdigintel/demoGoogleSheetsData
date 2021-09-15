@@ -16,5 +16,5 @@ fun main() {
             ChatWidgetChannel,
             TelephonyChannel
         )
-    ).start(wait = true)
+    ).start(wait = false)
 }
