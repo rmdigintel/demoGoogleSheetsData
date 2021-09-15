@@ -1,51 +1,102 @@
 package com.justai.jaicf.template.scenario
 
-import io.ktor.client.*
-import io.ktor.client.engine.cio.*
-import io.ktor.client.features.*
-import io.ktor.client.features.json.*
-import io.ktor.client.features.json.serializer.*
-import io.ktor.http.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import kotlinx.serialization.*
-import kotlinx.coroutines.coroutineScope
-import org.slf4j.LoggerFactory
-import java.io.FileInputStream
-import java.util.Timer
-import kotlin.concurrent.schedule
+import com.google.gson.*
+import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 
-//GLOBAL VARS
-//const val SHEET_ID = "1UGSi41MDJ3hHaI27uNDCPhmsBhiAd4zeRpTaZlUIBYs"
-//const val SHEET_NAME = "demobotData"
-//const val RANGE = "B2:B50"
+private val client = OkHttpClient()
 
-//@Serializable
-//data class Customer(inner class query =  )
-/*
-suspend fun main() {
-    val client = HttpClient(CIO)
-    val range = "'$SHEET_NAME'!$RANGE"
-    val response: HttpResponse = client.get("https://sheet2bot.herokuapp.com/api/rows?sheet=${SHEET_ID}&range=${range}") {
-    }
+data class Entity(
+    var id: Int,
+    var name: String,
+    var enabled: Boolean = true,
+    var type: String = "dictionary",
+    var priority: Int = 0,
+    var noSpelling: Boolean = false,
+    var noMorph: Boolean = false,
+    var phoneticSearch: Boolean = false,
+    var fuzzySearch: Boolean = false,
+    var client: Boolean = false)
+
+// type = "pattern" || "synonyms"
+data class EntityPattern(
+    var id: Int,
+    var type: String,
+    var rule: List<String>,
+    var value: String = "",
+    var clientId: Any? = null)
+
+data class EntityRecord(var data: EntityPattern, var clientId: Any? = null)
+
+fun createNamedEntity(): Entity? {
+    //var body = Entity("check")
+    val entityRequest = Entity(
+        id = 0,
+        name = "check")
+    val json: String = Gson().toJson(entityRequest)
+    println(json)
+    val body = RequestBody.create(("application/json; charset=utf-8".toMediaTypeOrNull()), json)
+    val request = Request.Builder()
+        .url("https://app.jaicp.com/cailapub/api/caila/p/b5bdcb48-76de-4c01-9f70-1408244c79b9/entities")
+        .post(body)
+        .build()
+    val response = client.newCall(request).execute()
+    val responseParsed = response.body!!.string()
+    var testModel = Gson().fromJson(responseParsed, Entity::class.java)
+    entityRequest.id = testModel.id
     println(response)
-}*/
-/*
-val client = HttpClient(CIO) {
-    install(JsonFeature) {}
+    println(response.body!!)
+    println(responseParsed)
+    println(entityRequest.id)
+    return testModel
 }
-val range = "'" + SHEET_NAME + "'!" + RANGE
-val response: HttpResponse = client.get("https://sheet2bot.herokuapp.com/api/rows?sheet=${SHEET_ID}&range=${range}") {
-}*/
-/*
-val timer = Timer("SettingUp", false).schedule(0, 100000) {
-    launch { getData() }
-    val range = "'" + SHEET_NAME + "'!" + RANGE
-    var res = getData(range)
-    var link = "https://sheet2bot.herokuapp.com/api/rows?sheet=${SHEET_ID}&range=${RANGE}";
 
-    }
+fun addEntityRecord(entityId: Int, pattern: List<String>): EntityPattern? {
+    val entityPattern = EntityPattern(id = 0, type = "pattern", rule = pattern)
+    val entityRequest = EntityRecord(data = entityPattern)
+    val json: String = Gson().toJson(entityRequest)
+    println(json)
+    val body = RequestBody.create(("application/json; charset=utf-8".toMediaTypeOrNull()), json)
+    val request = Request.Builder()
+        .url("https://app.jaicp.com/cailapub/api/caila/p/b5bdcb48-76de-4c01-9f70-1408244c79b9/entities/$entityId/records")
+        .post(body)
+        .build()
+    val response = client.newCall(request).execute()
+    val responseParsed = response.body!!.string()
+    val testModel = Gson().fromJson(responseParsed, EntityPattern::class.java)
+    println(response)
+    println(response.body!!)
+    println(responseParsed)
+    return testModel
 }
-//timer.start()
 
-*/
+
+/*
+fun getNamedEntities() {
+    val request = Request.Builder()
+        .url("https://app.jaicp.com/cailapub/api/caila/p/b5bdcb48-76de-4c01-9f70-1408244c79b9/entities")
+        .get()
+        .build()
+    val response = client.newCall(request).execute()
+    val responseParsed = response.body!!.string()
+}*/
+
+/*
+fun postNewEntity(){
+    val request = Request.Builder()
+        .url("https://app.jaicp.com/cailapub/api/caila/p/b5bdcb48-76de-4c01-9f70-1408244c79b9/entities")
+        .post()
+        .build()
+    val response = client.newCall(request).execute()
+    val responseParsed = response.body!!.string()
+}*/
+
+fun main() {
+    /* val checkEntity = createNamedEntity()
+    if (checkEntity != null) {
+        val checkEntityId = checkEntity.id
+    }*/
+    val checkEntityId = 77737
+    //addEntityRecord(77737, listOf("(проверк* работ*)"))
+    val checkEntityRecordId = 4646938
+}

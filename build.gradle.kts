@@ -27,6 +27,7 @@ dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.2")
     implementation("com.just-ai.jaicf:mongo:$jaicf")
+    implementation ("com.google.code.gson:gson:2.8.8")
 
     implementation("ch.qos.logback:logback-classic:$logback")
 
@@ -35,6 +36,7 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor")
     implementation ("io.github.rburgst:okhttp-digest:2.5")
     implementation ("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.+")
+
 
     implementation("com.just-ai.jaicf:core:$jaicf")
     implementation("com.just-ai.jaicf:jaicp:$jaicf")
