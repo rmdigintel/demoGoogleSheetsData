@@ -7,6 +7,8 @@ import okhttp3.*
 import java.util.*
 import kotlin.concurrent.schedule
 import com.fasterxml.jackson.module.kotlin.*
+import com.justai.jaicf.template.scripts.RANGE
+import com.justai.jaicf.template.scripts.SHEET_ID
 
 
 /*
@@ -34,12 +36,8 @@ fun main() {
 
 
 
-// GET запросы к API по таймеру
-const val SHEET_ID = "1UGSi41MDJ3hHaI27uNDCPhmsBhiAd4zeRpTaZlUIBYs"
-// const val SHEET_NAME = "demobotData"
-const val RANGE = "A2:B50"
-var DATA = mutableMapOf<String, Any?>()
 
+/*
 
 private val client = OkHttpClient()
 
@@ -87,3 +85,4 @@ fun main() {
 
     }
 }
+*/
