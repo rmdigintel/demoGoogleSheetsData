@@ -8,7 +8,8 @@ plugins {
 group = "com.justai.jaicf"
 version = "1.0.0"
 
-val jaicf = "1.1.3"
+// val jaicf = "1.1.3"
+val jaicf = "1.2.0"
 val logback = "1.2.3"
 
 // Main class to run application on heroku. Either JaicpPollerKt, or JaicpServerKt. Will propagate to .jar main class.
@@ -31,6 +32,7 @@ dependencies {
 
     implementation("ch.qos.logback:logback-classic:$logback")
 
+    // define a BOM and its version
     implementation(platform("com.squareup.okhttp3:okhttp-bom:4.9.0"))
     implementation("com.squareup.okhttp3:okhttp")
     implementation("com.squareup.okhttp3:logging-interceptor")

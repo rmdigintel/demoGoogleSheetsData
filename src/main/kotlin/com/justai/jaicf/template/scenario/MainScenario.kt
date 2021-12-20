@@ -2,11 +2,13 @@ package com.justai.jaicf.template.scenario
 
 import com.justai.jaicf.activator.caila.*
 import com.justai.jaicf.builder.Scenario
-import com.justai.jaicf.template.scripts.TAGS_AND_THEIR_CITIES
+import com.justai.jaicf.template.client
+import com.justai.jaicf.template.scripts.API_KEY
+//import com.justai.jaicf.template.scripts.TAGS_AND_THEIR_CITIES
 import com.justai.jaicf.template.scripts.cailaConform
+import com.mongodb.client.model.Filters
+import java.util.ArrayList
 
-
-// var TAGS_AND_THEIR_CITIES: MutableMap<String, MutableList<String>> = mutableMapOf("море" to mutableListOf("Сочи", "Геленджик"), "юг" to mutableListOf("Астрахань", "Краснодар"))
 
 val mainScenario = Scenario {
 
@@ -15,8 +17,11 @@ val mainScenario = Scenario {
             regex("/start")
             intent("Hello")
         }
+        activators ("/suggestCity") {
+            intent("Yes")
+        }
         action {
-            reactions.say("Куда вы хотите отправиться?")
+            reactions.sayRandom("Куда вы хотите отправиться?", "Какое место вы бы хотели посетить?", "Скажите, куда бы вы хотели отправиться?", "В каком месте вы хотите побывать?")
         }
     }
 
@@ -24,26 +29,43 @@ val mainScenario = Scenario {
         activators {
             intent("GetTag")
         }
-        action {
+        action{
+            // get tag from data in entity
             val tag = activator.caila?.slots?.get("tags")
-            if (TAGS_AND_THEIR_CITIES.containsKey(tag)){
-            //if (TAGS_AND_THEIR_CITIES[tag]){
-                //val cities = TAGS_AND_THEIR_CITIES[tag]?.random()
-                val cities = TAGS_AND_THEIR_CITIES[tag].toString()
-                val amount = TAGS_AND_THEIR_CITIES[tag]?.size
+            // find tag in mongo DB
+            val filter = Filters.eq("tag", tag)
+            val tagWithDestination = client.getDatabase("jaicf").getCollection("googleSheets").find(filter).first()
+            val destination = tagWithDestination?.getValue("destination") as ArrayList<String>
+            if (destination.size > 0) {
+                val cities = destination.toString()
+                val amount = destination.size
                 val input = request.input
-                if (amount != null){
-                    val cityConformed = cailaConform("город", amount, "b5bdcb48-76de-4c01-9f70-1408244c79b9")
-                    reactions.say("По вашему запросу \"$input\" мне удалось найти $amount $cityConformed: $cities")
-                }
-                //reactions.say("Вы можете отправиться в $cities")
-                else {
-                    reactions.say("Я пока не знаю такого направления")
-                }
+                val cityConformed = cailaConform("город", amount, API_KEY)
+                reactions.say("По вашему запросу \"$input\" мне удалось найти $amount $cityConformed: $cities")
             } else {
-                reactions.say("Я пока не знаю такого направления")
+                reactions.say("Я пока не знаю подходящего места по вашему запросу. Может, вам интересно другое направление?")
             }
-            reactions.go("/start")
+        }
+    }
+
+    state("thanks") {
+        activators {
+            intent("Thanks")
+        }
+        activators ("/suggestCity") {
+            intent("Good")
+        }
+        action {
+            reactions.say("Рад, что вам понравилось!")
+        }
+    }
+
+    state("no") {
+        activators {
+            intent("No")
+        }
+        action {
+            reactions.say("Очень жаль, что я не смог вам помочь!")
         }
     }
 
@@ -52,11 +74,11 @@ val mainScenario = Scenario {
             intent("Bye")
         }
         action {
-            reactions.say("Пока!")
+            reactions.say("Обращайтесь снова! До встречи!")
         }
     }
 
     fallback {
-        reactions.say("Я ничего не понял. Переформулируй свой запрос.")
+        reactions.say("Я пока не знаю подходящего места по вашему запросу. Может, вам интересно другое направление?")
     }
 }

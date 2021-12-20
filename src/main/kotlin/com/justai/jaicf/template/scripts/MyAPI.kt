@@ -2,9 +2,12 @@ package com.justai.jaicf.template.scripts
 
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.Response
+
 
 private val client = OkHttpClient()
 
+/*
 fun postRequest(url: String, body: String): String {
     val request = Request.Builder()
         .url(url)
@@ -17,7 +20,7 @@ fun postRequest(url: String, body: String): String {
         println(response.code)
         "400"
     }
-}
+}*/
 
 fun getRequest(url: String): String {
     val request = Request.Builder()

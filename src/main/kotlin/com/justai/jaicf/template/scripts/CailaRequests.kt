@@ -9,7 +9,6 @@ import java.net.URL
 
 
 private val client = OkHttpClient()
-
 data class Entity(
     var id: Int,
     var name: String,
@@ -21,23 +20,15 @@ data class Entity(
     var phoneticSearch: Boolean = false,
     var fuzzySearch: Boolean = false,
     var client: Boolean = false)
-
 data class EntityPattern(
     var id: Int,
     var type: String, // type = "pattern" || "synonyms"
     var rule: List<String>,
     var value: String,
     var clientId: Any? = null)
-
-data class Paging(
-    val pageNum: Int,
-    val pageSize: Int,
-    val totalCount: Int)
-
+//data class Paging(val pageNum: Int, val pageSize: Int, val totalCount: Int)
 data class EntityWithRecords(var entity: Entity, var records: MutableList<EntityPattern>)
-data class EntityRecord(var data: EntityPattern, var clientId: Any? = null)
-
-
+//data class EntityRecord(var data: EntityPattern, var clientId: Any? = null)
 data class ProjectInfo(var id: String, var name: String, var folder: String)
 data class STSSettings(val exactMatch: Any? = 1,
                        val lemmaMatch: Any? = 0.95,
@@ -56,7 +47,6 @@ data class STSSettings(val exactMatch: Any? = 1,
                        val idfShift: Any? = 0,
                        val idfMultiplier: Any? = 1,
                        val namedEntitiesRequired: Boolean = true)
-
 data class ExtendedSettings(val patternsEnabled: Boolean = true,
                             val tokenizerEngine: String = "udpipe",
                             val stsSettings: STSSettings,
@@ -72,14 +62,12 @@ data class ExtendedSettings(val patternsEnabled: Boolean = true,
                             val useShared: Any?,
                             val zflPatternsEnabled: Any?,
                             val externalNluSettings: Any?)
-
 data class ProjectSettings(val language: String = "ru",
                            val spellingCorrection: Boolean = false,
                            val classificationAlgorithm: String = "sts",
                            val timezone: String = "UTC",
                            val extendedSettings: ExtendedSettings,
                            val shared: Boolean = false)
-
 data class Project(
     var project: ProjectInfo,
     var settings: ProjectSettings,
@@ -90,110 +78,32 @@ data class Project(
     var systemEntities: List<Any>
 )
 
+fun createRecord(pattern: List<String>, value: String): EntityPattern {
+    return EntityPattern(0, "pattern", pattern, value)
+}
+
 fun exportProject(): Project? {
     val body = RequestBody.create(null, byteArrayOf())
     val request = Request.Builder()
-        .url("https://app.jaicp.com/cailapub/api/caila/p/b5bdcb48-76de-4c01-9f70-1408244c79b9/export")
+        .url("https://app.jaicp.com/cailapub/api/caila/p/$API_KEY/export")
         .post(body)
         .build()
     val response = client.newCall(request).execute()
     val responseParsed = response.body!!.string()
-    val responseString = Gson().fromJson(responseParsed, Project::class.java)
-   // println(responseString)
-    return responseString
+    return Gson().fromJson(responseParsed, Project::class.java)
 }
 
 fun importProject(project: Project) {
     val json: String = Gson().toJson(project)
     val body = RequestBody.create(("application/json; charset=utf-8".toMediaTypeOrNull()), json)
     val request = Request.Builder()
-        .url("https://app.jaicp.com/cailapub/api/caila/p/b5bdcb48-76de-4c01-9f70-1408244c79b9/import")
+        .url("https://app.jaicp.com/cailapub/api/caila/p/$API_KEY/import")
         .post(body)
         .build()
     val response = client.newCall(request).execute()
     val responseParsed = response.body!!.string()
-    // println(responseString)
     println(Gson().fromJson(responseParsed, Project::class.java))
 }
-
-/*
-fun getNamedEntities() {
-    val request = Request.Builder()
-        .url("https://app.jaicp.com/cailapub/api/caila/p/b5bdcb48-76de-4c01-9f70-1408244c79b9/entities")
-        .get()
-        .build()
-    val response = client.newCall(request).execute()
-    val responseParsed = response.body!!.string()
-}*/
-
-/*
-fun postNewEntity(){
-    val request = Request.Builder()
-        .url("https://app.jaicp.com/cailapub/api/caila/p/b5bdcb48-76de-4c01-9f70-1408244c79b9/entities")
-        .post()
-        .build()
-    val response = client.newCall(request).execute()
-    val responseParsed = response.body!!.string()
-}*/
-
-/*
-fun createNamedEntity(): Entity? {
-    //var body = Entity("check")
-    val entityRequest = Entity(
-        id = 0,
-        name = "check")
-    val json: String = Gson().toJson(entityRequest)
-    println(json)
-    val body = RequestBody.create(("application/json; charset=utf-8".toMediaTypeOrNull()), json)
-    val request = Request.Builder()
-        .url("https://app.jaicp.com/cailapub/api/caila/p/b5bdcb48-76de-4c01-9f70-1408244c79b9/entities")
-        .post(body)
-        .build()
-    val response = client.newCall(request).execute()
-    val responseParsed = response.body!!.string()
-    val responseString = Gson().fromJson(responseParsed, Entity::class.java)
-    entityRequest.id = responseString.id
-    println(response)
-    println(response.body!!)
-    println(responseParsed)
-    println(entityRequest.id)
-    return responseString
-}
-fun createRecord(pattern: List<String>, value: String): EntityPattern {
-    return EntityPattern(0, "pattern", pattern, value)
-}
-
-fun getEntityRecord(name: String): List<EntityPattern> {
-    val request = Request.Builder()
-        .url("https://app.jaicp.com/cailapub/api/caila/p/b5bdcb48-76de-4c01-9f70-1408244c79b9/entities-by-names/$name/records")
-        .get()
-        .build()
-    val response = client.newCall(request).execute()
-    val responseParsed = response.body!!.string()
-    val responseString = Gson().fromJson(responseParsed, EntityWithRecords::class.java)
-    println(response)
-    println(response.body!!)
-    println(responseParsed)
-    return responseString.records
-}
-
-fun addEntityRecord(entityID: Int, pattern: List<String>, value: String) {
-    val entityPattern = EntityPattern(id = 0, type = "pattern", rule = pattern, value = value)
-    val entityRequest = EntityRecord(data = entityPattern)
-    val json: String = Gson().toJson(entityRequest)
-    println(json)
-    val body = RequestBody.create(("application/json; charset=utf-8".toMediaTypeOrNull()), json)
-    val request = Request.Builder()
-        .url("https://app.jaicp.com/cailapub/api/caila/p/b5bdcb48-76de-4c01-9f70-1408244c79b9/entities/$entityID/records")
-        .post(body)
-        .build()
-    val response = client.newCall(request).execute()
-    val responseParsed = response.body!!.string()
-    val responseString = Gson().fromJson(responseParsed, EntityPattern::class.java)
-    println(response)
-    println(response.body!!)
-    println(responseParsed)
-}*/
 
 fun cailaConform(text: String, number: Int, apiKey: String): String {
     val client = OkHttpClient()
@@ -203,28 +113,32 @@ fun cailaConform(text: String, number: Int, apiKey: String): String {
         .get()
         .build()
     val response = client.newCall(request).execute()
-
     return response.body!!.string()
 }
 
-fun main() {
-    /* val checkEntity = createNamedEntity()
-    if (checkEntity != null) {
-        val checkEntityId = checkEntity.id
-    }*/
-    //val tagsEntityID = 77794
-    //addEntityRecord(tagsEntityID, listOf("(юг*)"), "юг")
-    //val checkEntityRecordId = 4646938
-    //val intentID = 2474354
-    /*
-    val entityName = "tags"
-    val x = addEntityRecord(ENTITY_NAME, listOf("(солнц*)"), "солнце")
-    println(x)
-    /*val records = getEntityRecord(entityName)
-    for (each in records) {
-        println(each.value)
-    }*/
+fun addRecordingsToProject(project: Project, tags: MutableList<TagPattern>): Project {
+    val tagsRecordsValues: MutableList<String> = mutableListOf()
+    val editedProject: Project = project;
+    for (i in 0..project.entities.size) {
+        if (project.entities[i].entity.name == ENTITY_NAME) {
+            for (each in project.entities[i].records) {
+                tagsRecordsValues += each.value
+            }
+            for (tag in tags){
+                // check if there is no record for a tag in entity "tags"
+                if (tag.name !in tagsRecordsValues) {
+                    val needToImport = true
+                    val record = createRecord(listOf(tag.pattern), tag.name)
+                    project.entities[i].records.add(record)
+                    println(record)
+                }
+            }
 
-     */
+        }
+    }
+    return project
+}
+
+fun main() {
     exportProject()
 }
