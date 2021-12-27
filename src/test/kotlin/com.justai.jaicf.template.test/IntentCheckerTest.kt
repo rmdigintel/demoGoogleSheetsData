@@ -8,4 +8,21 @@ class IntentCheckerTest: ScenarioTest(intentCheckerScenario) {
     fun `Check Hello`() {
         query("привет") responds "/Hello"
     }
+
+    @Test
+    fun `Thanks`() {
+        query("спасибо") responds "/Thanks"
+    }
+
+    @Test
+    fun `Yes`() {
+        query("ага") responds "/Yes"
+    }
+
+    @Test
+    fun `No`() {
+        query("неа") responds "/No"
+    }
+
+
 }
