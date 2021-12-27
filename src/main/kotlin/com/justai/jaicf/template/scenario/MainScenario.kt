@@ -6,9 +6,12 @@ import com.justai.jaicf.template.client
 import com.justai.jaicf.template.scripts.API_KEY
 //import com.justai.jaicf.template.scripts.TAGS_AND_THEIR_CITIES
 import com.justai.jaicf.template.scripts.cailaConform
+import com.justai.jaicf.test.context.runInTest
 import com.mongodb.client.model.Filters
+import java.awt.Point
 import java.util.ArrayList
 
+typealias CitiesAndAmount = Pair<String, Int>
 
 val mainScenario = Scenario {
 
@@ -31,14 +34,17 @@ val mainScenario = Scenario {
         }
         action{
             // get tag from data in entity
-            val tag = activator.caila?.slots?.get("tags")
+            var tag = activator.caila?.slots?.get("tags")
+            runInTest {
+                tag = getVar("tag") as? String
+            }
             // find tag in mongo DB
             val filter = Filters.eq("tag", tag)
             val tagWithDestination = client.getDatabase("jaicf").getCollection("googleSheets").find(filter).first()
-            val destination = tagWithDestination?.getValue("destination") as ArrayList<String>
-            if (destination.size > 0) {
-                val cities = destination.toString()
-                val amount = destination.size
+            //val destination = tagWithDestination?.getValue("destination") as ArrayList<*>
+            val destination = if (tagWithDestination != null) tagWithDestination.getValue("destination") as ArrayList<*> else listOf()
+            if (destination.isNotEmpty()) {
+                val (cities, amount) = CitiesAndAmount(destination.joinToString(), destination.size)
                 val input = request.input
                 val cityConformed = cailaConform("город", amount, API_KEY)
                 reactions.say("По вашему запросу \"$input\" мне удалось найти $amount $cityConformed: $cities")
@@ -82,3 +88,4 @@ val mainScenario = Scenario {
         reactions.say("Я пока не знаю подходящего места по вашему запросу. Может, вам интересно другое направление?")
     }
 }
+

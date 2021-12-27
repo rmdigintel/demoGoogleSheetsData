@@ -78,6 +78,21 @@ data class Project(
     var systemEntities: List<Any>
 )
 
+data class Intent(
+    val id: Int,
+    val path: String,
+    val answer: Any,
+    val customData: Any,
+    val slots: Any,
+    val priority: Int)
+
+data class GetIntent(
+    val intent: Intent,
+    val confidence: Double,
+    val slots: List<Any>,
+    val debug: Any
+)
+
 fun createRecord(pattern: List<String>, value: String): EntityPattern {
     return EntityPattern(0, "pattern", pattern, value)
 }
@@ -116,6 +131,18 @@ fun cailaConform(text: String, number: Int, apiKey: String): String {
     return response.body!!.string()
 }
 
+fun cailaGetInference(text: String, apiKey: String): GetIntent {
+    val client = OkHttpClient()
+    val url = URL("https://app.jaicp.com/cailapub/api/caila/p/$apiKey/nlu/inference?query=$text")
+    val request = Request.Builder()
+        .url(url)
+        .get()
+        .build()
+    val response = client.newCall(request).execute()
+    val responseParsed = response.body!!.string()
+    return Gson().fromJson(responseParsed, GetIntent::class.java)
+}
+
 fun addRecordingsToProject(project: Project, tags: MutableList<TagPattern>): Project {
     val tagsRecordsValues: MutableList<String> = mutableListOf()
     val editedProject: Project = project;
@@ -127,7 +154,6 @@ fun addRecordingsToProject(project: Project, tags: MutableList<TagPattern>): Pro
             for (tag in tags){
                 // check if there is no record for a tag in entity "tags"
                 if (tag.name !in tagsRecordsValues) {
-                    val needToImport = true
                     val record = createRecord(listOf(tag.pattern), tag.name)
                     project.entities[i].records.add(record)
                     println(record)
@@ -140,5 +166,5 @@ fun addRecordingsToProject(project: Project, tags: MutableList<TagPattern>): Pro
 }
 
 fun main() {
-    exportProject()
+    println(cailaGetInference("приветик", API_KEY).intent.path)
 }

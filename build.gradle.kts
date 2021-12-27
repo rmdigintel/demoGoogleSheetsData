@@ -11,6 +11,7 @@ version = "1.0.0"
 // val jaicf = "1.1.3"
 val jaicf = "1.2.0"
 val logback = "1.2.3"
+val nlpVersion = "1.0.0"
 
 // Main class to run application on heroku. Either JaicpPollerKt, or JaicpServerKt. Will propagate to .jar main class.
 application {
@@ -43,6 +44,7 @@ dependencies {
     implementation("com.just-ai.jaicf:core:$jaicf")
     implementation("com.just-ai.jaicf:jaicp:$jaicf")
     implementation("com.just-ai.jaicf:caila:$jaicf")
+    implementation ("com.londogard:londogard-nlp-toolkit:$nlpVersion")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
     testRuntime("org.junit.jupiter:junit-jupiter-engine:5.6.0")
