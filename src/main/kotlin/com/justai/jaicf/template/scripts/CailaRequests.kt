@@ -7,7 +7,6 @@ import okhttp3.Request
 import okhttp3.RequestBody
 import java.net.URL
 
-
 private val client = OkHttpClient()
 data class Entity(
     var id: Int,
@@ -77,7 +76,6 @@ data class Project(
     var spellerDictionary: List<Any>,
     var systemEntities: List<Any>
 )
-
 data class Intent(
     val id: Int,
     val path: String,
@@ -85,7 +83,6 @@ data class Intent(
     val customData: Any,
     val slots: Any,
     val priority: Int)
-
 data class GetIntent(
     val intent: Intent,
     val confidence: Double,
@@ -143,28 +140,3 @@ fun cailaGetInference(text: String, apiKey: String): GetIntent {
     return Gson().fromJson(responseParsed, GetIntent::class.java)
 }
 
-fun addRecordingsToProject(project: Project, tags: MutableList<TagPattern>): Project {
-    val tagsRecordsValues: MutableList<String> = mutableListOf()
-    val editedProject: Project = project;
-    for (i in 0..project.entities.size) {
-        if (project.entities[i].entity.name == ENTITY_NAME) {
-            for (each in project.entities[i].records) {
-                tagsRecordsValues += each.value
-            }
-            for (tag in tags){
-                // check if there is no record for a tag in entity "tags"
-                if (tag.name !in tagsRecordsValues) {
-                    val record = createRecord(listOf(tag.pattern), tag.name)
-                    project.entities[i].records.add(record)
-                    println(record)
-                }
-            }
-
-        }
-    }
-    return project
-}
-
-fun main() {
-    println(cailaGetInference("приветик", API_KEY).intent.path)
-}

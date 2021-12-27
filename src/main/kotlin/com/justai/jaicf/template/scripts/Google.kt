@@ -12,7 +12,14 @@ data class TagPattern(
 )
 
 val stemmer = Stemmer(LanguageSupport.ru)
+typealias CityWithTags = Pair<String, List<String>>
 
+fun parseResponseFromGoogle(line: String): CityWithTags{
+    val lineSplit = line.split("\",\"")
+    val city = lineSplit[0].replace("\"", "").replace("[", "").replace("]", "")
+    val tags = lineSplit[1].replace("\"", "").replace("[", "").replace("]", "").split(", ")
+    return CityWithTags(city, tags)
+}
 
 fun makePattern(tag: String): String {
     return tag.split(" ").joinToString(
@@ -36,13 +43,10 @@ fun parseTags(url: String): MutableList<TagPattern> {
     // couldn't parse with gson, the data is an array
     val responseParsed = response.split("],[")
     for (each in responseParsed) {
-        val eachParsed = (each.split("\",\""))
-        val city = eachParsed[0].replace("\"", "").replace("[", "").replace("]", "")
-        val tags = eachParsed[1].replace("\"", "").replace("[", "").replace("]", "").split(", ")
+        val (city, tags) = parseResponseFromGoogle(each)
         for (tagRaw in tags) {
             val tag = tagRaw.trim().toLowerCase()
-            val filter = Filters.eq("tag", tag)
-            val foundTagWithCities: Document? = myCollection.find(filter).first()
+            val foundTagWithCities = findFirstDocument(tag, myCollection)
             if (foundTagWithCities == null) {
                 //add field in mongo
                 val newDocument = createDocument(tag, arrayListOf<String>(city))
@@ -59,4 +63,38 @@ fun parseTags(url: String): MutableList<TagPattern> {
         }
     }
     return (tagsWithPats)
+}
+
+fun updateTagsAndDestination(tags: MutableList<TagPattern>) {
+    var needToImport = false
+    // check if there are new tags in Google Sheet
+    if (tags.isNotEmpty()) {
+        println(tags)
+        val project = exportProject()
+        // check if request is ok
+        if (project != null) {
+            println(project)
+            val tagsRecordsValues: MutableList<String> = mutableListOf()
+            for (i in 0..project.entities.size) {
+                if (project.entities[i].entity.name == ENTITY_NAME) {
+                    for (each in project.entities[i].records) {
+                        tagsRecordsValues += each.value
+                    }
+                    for (tag in tags){
+                        // check if there is no record for a tag in entity "tags"
+                        if (tag.name !in tagsRecordsValues) {
+                            needToImport = true
+                            val record = createRecord(listOf(tag.pattern), tag.name)
+                            project.entities[i].records.add(record)
+                            println(record)
+                        }
+                    }
+                    break
+                }
+            }
+            if (needToImport){
+                importProject(project)
+            }
+        }
+    }
 }

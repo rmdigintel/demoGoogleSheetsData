@@ -6,6 +6,7 @@ import com.justai.jaicf.template.client
 import com.justai.jaicf.template.scripts.API_KEY
 //import com.justai.jaicf.template.scripts.TAGS_AND_THEIR_CITIES
 import com.justai.jaicf.template.scripts.cailaConform
+import com.justai.jaicf.template.scripts.findFirstDocument
 import com.justai.jaicf.test.context.runInTest
 import com.mongodb.client.model.Filters
 import java.awt.Point
@@ -39,9 +40,7 @@ val mainScenario = Scenario {
                 tag = getVar("tag") as? String
             }
             // find tag in mongo DB
-            val filter = Filters.eq("tag", tag)
-            val tagWithDestination = client.getDatabase("jaicf").getCollection("googleSheets").find(filter).first()
-            //val destination = tagWithDestination?.getValue("destination") as ArrayList<*>
+            val tagWithDestination = findFirstDocument(tag, client.getDatabase("jaicf").getCollection("googleSheets"))
             val destination = if (tagWithDestination != null) tagWithDestination.getValue("destination") as ArrayList<*> else listOf()
             if (destination.isNotEmpty()) {
                 val (cities, amount) = CitiesAndAmount(destination.joinToString(), destination.size)
