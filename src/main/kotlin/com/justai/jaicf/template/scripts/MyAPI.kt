@@ -4,10 +4,9 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 
-private val client = OkHttpClient()
-
 /*
 fun postRequest(url: String, body: String): String {
+    val client = OkHttpClient()
     val request = Request.Builder()
         .url(url)
         .get()
@@ -22,6 +21,7 @@ fun postRequest(url: String, body: String): String {
 }*/
 
 fun getRequest(url: String): String {
+    val client = OkHttpClient()
     val request = Request.Builder()
         .url(url)
         .get()
