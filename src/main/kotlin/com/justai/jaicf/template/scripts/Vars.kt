@@ -1,7 +1,7 @@
 package com.justai.jaicf.template.scripts
 
 // GLOBAL VARS
-var ENTITY_NAME = "tags"
+const val ENTITY_NAME = "tags"
 //token for jaicf
 const val API_KEY = "b5bdcb48-76de-4c01-9f70-1408244c79b9"
 
