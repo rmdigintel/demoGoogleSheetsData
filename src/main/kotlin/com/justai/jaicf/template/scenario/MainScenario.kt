@@ -56,7 +56,8 @@ val mainScenario = Scenario {
                 reactions.say("По вашему запросу \"$input\" мне удалось найти $amount $cityConformed: $cities")
                 reactions.say("Вы довольны результатом поиска?")
             } else {
-                reactions.go("/fallback")
+                reactions.say("Я пока не знаю подходящего места по вашему запросу.")
+                reactions.go("/help")
             }
         }
 
@@ -109,7 +110,8 @@ val mainScenario = Scenario {
             catchAll()
         }
         action {
-            reactions.say("Я пока не знаю подходящего места по вашему запросу. Попробуйте ввести другое направление.")
+            reactions.say("Я пока не знаю подходящего места по вашему запросу.")
+            reactions.go("/help")
         }
     }
 }
