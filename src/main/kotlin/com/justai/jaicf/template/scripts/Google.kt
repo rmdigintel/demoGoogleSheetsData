@@ -41,23 +41,25 @@ fun parseTags(url: String): MutableList<TagPattern> {
         return tagsWithPats
     }
     // couldn't parse with gson, the data is an array
-    val responseParsed = response.split("],[")
-    for (each in responseParsed) {
-        val (city, tags) = parseResponseFromGoogle(each)
-        for (tagRaw in tags) {
-            val tag = tagRaw.trim().toLowerCase()
-            val foundTagWithCities = findFirstDocument(tag, myCollection)
-            if (foundTagWithCities == null) {
-                //add field in mongo
-                val newDocument = createDocument(tag, arrayListOf<String>(city))
-                myCollection.insertOne(newDocument)
-                tagsWithPats += TagPattern(tag, makePattern(tag))
-            } else {
-                val destination = foundTagWithCities.getValue("destination") as MutableList<String>
-                if (!destination.contains(city)) {
-                    destination.add(city)
-                    val id = foundTagWithCities.getValue("_id")
-                    myCollection.replaceOne(Filters.eq("_id", id), createDocument(tag, destination))
+    val responseParsed = response?.split("],[")
+    if (responseParsed != null) {
+        for (each in responseParsed) {
+            val (city, tags) = parseResponseFromGoogle(each)
+            for (tagRaw in tags) {
+                val tag = tagRaw.trim().toLowerCase()
+                val foundTagWithCities = findFirstDocument(tag, myCollection)
+                if (foundTagWithCities == null) {
+                    //add field in mongo
+                    val newDocument = createDocument(tag, arrayListOf<String>(city))
+                    myCollection.insertOne(newDocument)
+                    tagsWithPats += TagPattern(tag, makePattern(tag))
+                } else {
+                    val destination = foundTagWithCities.getValue("destination") as MutableList<String>
+                    if (!destination.contains(city)) {
+                        destination.add(city)
+                        val id = foundTagWithCities.getValue("_id")
+                        myCollection.replaceOne(Filters.eq("_id", id), createDocument(tag, destination))
+                    }
                 }
             }
         }

@@ -1,13 +1,12 @@
 package com.justai.jaicf.template.scripts
 
 import com.google.gson.Gson
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
 import java.net.URL
 
-private val client = OkHttpClient()
 data class Entity(
     var id: Int,
     var name: String,
@@ -94,38 +93,41 @@ fun createRecord(pattern: List<String>, value: String): EntityPattern {
     return EntityPattern(0, "pattern", pattern, value)
 }
 
+
 fun exportProject(): Project? {
+    val client = OkHttpClient()
     val body = RequestBody.create(null, byteArrayOf())
     val request = Request.Builder()
         .url("https://app.jaicp.com/cailapub/api/caila/p/$API_KEY/export")
         .post(body)
         .build()
     val response = client.newCall(request).execute()
-    val responseParsed = response.body!!.string()
+    val responseParsed = response.body()?.string()
     return Gson().fromJson(responseParsed, Project::class.java)
 }
 
 fun importProject(project: Project) {
+    val JSON = MediaType.parse("application/json; charset=utf-8")
+    val client = OkHttpClient()
     val json: String = Gson().toJson(project)
-    val body = RequestBody.create(("application/json; charset=utf-8".toMediaTypeOrNull()), json)
+    val body = RequestBody.create(JSON, json)
     val request = Request.Builder()
         .url("https://app.jaicp.com/cailapub/api/caila/p/$API_KEY/import")
         .post(body)
         .build()
     val response = client.newCall(request).execute()
-    val responseParsed = response.body!!.string()
+    val responseParsed = response.body()?.string()
     println(Gson().fromJson(responseParsed, Project::class.java))
 }
 
-fun cailaConform(text: String, number: Int, apiKey: String): String {
+fun cailaConform(text: String, number: Int, apiKey: String): String? {
     val client = OkHttpClient()
     val url = URL("https://app.jaicp.com/cailapub/api/caila/p/$apiKey/nlu/conform?text=$text&number=$number")
     val request = Request.Builder()
         .url(url)
-        .get()
         .build()
     val response = client.newCall(request).execute()
-    return response.body!!.string()
+    return response.body()?.string()!!
 }
 
 fun cailaGetInference(text: String, apiKey: String): GetIntent {
@@ -133,10 +135,8 @@ fun cailaGetInference(text: String, apiKey: String): GetIntent {
     val url = URL("https://app.jaicp.com/cailapub/api/caila/p/$apiKey/nlu/inference?query=$text")
     val request = Request.Builder()
         .url(url)
-        .get()
         .build()
     val response = client.newCall(request).execute()
-    val responseParsed = response.body!!.string()
+    val responseParsed = response.body()?.string()
     return Gson().fromJson(responseParsed, GetIntent::class.java)
 }
-
