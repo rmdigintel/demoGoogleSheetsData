@@ -3,6 +3,7 @@ plugins {
     kotlin("jvm") version "1.4.31"
     id("com.justai.jaicf.jaicp-build-plugin") version "0.1.1"
     kotlin("plugin.serialization") version "1.5.30"
+    id("com.github.johnrengelman.shadow") version "5.0.0"
 }
 
 group = "com.justai.jaicf"
@@ -69,6 +70,16 @@ tasks {
 
 tasks.create("stage") {
     dependsOn("shadowJar")
+}
+
+tasks.withType<Jar> {
+    manifest {
+        attributes(
+            mapOf(
+                "Main-Class" to application.mainClassName
+            )
+        )
+    }
 }
 
 tasks.withType<com.justai.jaicf.plugins.jaicp.build.JaicpBuild> {

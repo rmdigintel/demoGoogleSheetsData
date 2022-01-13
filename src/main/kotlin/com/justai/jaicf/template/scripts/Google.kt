@@ -3,6 +3,11 @@ package com.justai.jaicf.template.scripts
 import com.justai.jaicf.template.myCollection
 import com.londogard.nlp.stemmer.Stemmer
 import com.londogard.nlp.utils.LanguageSupport
+import com.mongodb.ConnectionString
+import com.mongodb.MongoClientSettings
+import com.mongodb.client.MongoClient
+import com.mongodb.client.MongoClients
+import com.mongodb.client.MongoCollection
 import com.mongodb.client.model.Filters
 import org.bson.Document
 
