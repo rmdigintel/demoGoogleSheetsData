@@ -11,8 +11,9 @@ version = "1.0.0"
 
 // val jaicf = "1.1.3"
 val jaicf = "1.2.2"
-val logback = "1.2.3"
+val logback = "1.2.10"
 val nlpVersion = "1.0.0"
+val slf4j = "1.7.30"
 
 // Main class to run application on heroku. Either JaicpPollerKt, or JaicpServerKt. Will propagate to .jar main class.
 application {
@@ -47,6 +48,11 @@ dependencies {
     implementation("com.just-ai.jaicf:jaicp:$jaicf")
     implementation("com.just-ai.jaicf:caila:$jaicf")
     implementation("com.just-ai.jaicf:telegram:$jaicf")
+
+    //implementation("io.ktor:ktor-server-netty:1.6.7")
+    implementation("org.slf4j:slf4j-simple:$slf4j")
+    implementation("org.slf4j:slf4j-log4j12:$slf4j")
+
     implementation ("com.londogard:londogard-nlp-toolkit:$nlpVersion")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
