@@ -93,50 +93,30 @@ fun createRecord(pattern: List<String>, value: String): EntityPattern {
     return EntityPattern(0, "pattern", pattern, value)
 }
 
-
 fun exportProject(): Project? {
-    val client = OkHttpClient()
     val body = RequestBody.create(null, byteArrayOf())
-    val request = Request.Builder()
-        .url("https://app.jaicp.com/cailapub/api/caila/p/$API_KEY/export")
-        .post(body)
-        .build()
-    val response = client.newCall(request).execute()
-    val responseParsed = response.body()?.string()
+    val url = "https://app.jaicp.com/cailapub/api/caila/p/$API_KEY/export"
+    val responseParsed = postRequest(url, body)
     return Gson().fromJson(responseParsed, Project::class.java)
 }
 
 fun importProject(project: Project) {
     val JSON = MediaType.parse("application/json; charset=utf-8")
-    val client = OkHttpClient()
     val json: String = Gson().toJson(project)
     val body = RequestBody.create(JSON, json)
-    val request = Request.Builder()
-        .url("https://app.jaicp.com/cailapub/api/caila/p/$API_KEY/import")
-        .post(body)
-        .build()
-    val response = client.newCall(request).execute()
-    val responseParsed = response.body()?.string()
+    val url = "https://app.jaicp.com/cailapub/api/caila/p/$API_KEY/import"
+    val responseParsed = postRequest(url, body)
     println(Gson().fromJson(responseParsed, Project::class.java))
 }
 
 fun cailaConform(text: String, number: Int, apiKey: String): String? {
-    val client = OkHttpClient()
-    val url = URL("https://app.jaicp.com/cailapub/api/caila/p/$apiKey/nlu/conform?text=$text&number=$number")
-    val request = Request.Builder()
-        .url(url)
-        .build()
-    val response = client.newCall(request).execute()
-    return response.body()?.string()!!
+    val url = "https://app.jaicp.com/cailapub/api/caila/p/$apiKey/nlu/conform?text=$text&number=$number"
+    val response = getRequest(url)
+    return response!!
 }
 
 fun cailaGetInference(text: String, apiKey: String): GetIntent {
-    val client = OkHttpClient()
-    val url = URL("https://app.jaicp.com/cailapub/api/caila/p/$apiKey/nlu/inference?query=$text")
-    val request = Request.Builder()
-        .url(url)
-        .build()
-    val response = client.newCall(request).execute()
-    val responseParsed = response.body()?.string()
-    return Gson().fromJson(responseParsed, GetIntent::class.java)
+    val url = "https://app.jaicp.com/cailapub/api/caila/p/$apiKey/nlu/inference?query=$text"
+    val response = getRequest(url)
+    return Gson().fromJson(response, GetIntent::class.java)
 }
