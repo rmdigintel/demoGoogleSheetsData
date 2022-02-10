@@ -10,7 +10,7 @@ import com.justai.jaicf.template.scripts.RANGE
 import com.justai.jaicf.template.scripts.SHEET_ID
 import com.justai.jaicf.template.scripts.parseTags
 import com.justai.jaicf.template.scripts.updateTagsAndDestination
-import com.justai.jaicf.template.templateBot
+import com.justai.jaicf.template.demoBot
 import java.util.*
 import kotlin.concurrent.schedule
 
@@ -22,7 +22,7 @@ fun main() {
         updateTagsAndDestination(tagsFromGoogleSheets)
     }
     JaicpServer(
-        botApi = templateBot,
+        botApi = demoBot,
         accessToken = accessToken,
         channels = listOf(
             ChatApiChannel,

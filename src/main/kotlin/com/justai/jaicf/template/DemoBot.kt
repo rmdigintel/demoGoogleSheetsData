@@ -31,7 +31,7 @@ private val cailaNLUSettings = CailaNLUSettings(
 
 )
 
-val templateBot = BotEngine(
+val demoBot = BotEngine(
     scenario = mainScenario,
     conversationLoggers = arrayOf(
         JaicpConversationLogger(accessToken),
