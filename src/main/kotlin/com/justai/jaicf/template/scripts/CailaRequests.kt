@@ -24,51 +24,10 @@ data class EntityPattern(
     var rule: List<String>,
     var value: String,
     var clientId: Any? = null)
-//data class Paging(val pageNum: Int, val pageSize: Int, val totalCount: Int)
 data class EntityWithRecords(var entity: Entity, var records: MutableList<EntityPattern>)
-//data class EntityRecord(var data: EntityPattern, var clientId: Any? = null)
-data class ProjectInfo(var id: String, var name: String, var folder: String)
-data class STSSettings(val exactMatch: Any? = 1,
-                       val lemmaMatch: Any? = 0.95,
-                       val jaccardMatch: Any? = 0.5,
-                       val jaccardMatchThreshold: Any? = 0.82,
-                       val acronymMatch: Any? = 1,
-                       val synonymMatch: Any? = 0,
-                       val synonymContextWeight: Any? = 0,
-                       val patternMatch: Any? = 1,
-                       val throughPatternMatch: Any? = 0,
-                       val wordSequence1: Any? = 0.8,
-                       val wordSequence2:Any? = 0.9,
-                       val wordSequence3: Any? = 1,
-                       val intermediateAlternativesLimit: Any? = 5,
-                       val finalAlternativesLimit: Any? = 5,
-                       val idfShift: Any? = 0,
-                       val idfMultiplier: Any? = 1,
-                       val namedEntitiesRequired: Boolean = true)
-data class ExtendedSettings(val patternsEnabled: Boolean = true,
-                            val tokenizerEngine: String = "udpipe",
-                            val stsSettings: STSSettings,
-                            val cnnSettings: Any?,
-                            val classicMLSettings: Any?,
-                            val logregSettings: Any?,
-                            val dictionaryAutogeneration: Any?,
-                            val luceneAnalyzer: Any?,
-                            val shareIntents: Any?,
-                            val shareEntities: Any?,
-                            val disableHieroglyphicsTokenization: Any?,
-                            val allowedPatterns: List<Any?>,
-                            val useShared: Any?,
-                            val zflPatternsEnabled: Any?,
-                            val externalNluSettings: Any?)
-data class ProjectSettings(val language: String = "ru",
-                           val spellingCorrection: Boolean = false,
-                           val classificationAlgorithm: String = "sts",
-                           val timezone: String = "UTC",
-                           val extendedSettings: ExtendedSettings,
-                           val shared: Boolean = false)
 data class Project(
-    var project: ProjectInfo,
-    var settings: ProjectSettings,
+    var project: Any,
+    var settings: Any,
     var intents: List<Any?>,
     var entities: MutableList<EntityWithRecords>,
     var enabledSystemEntities: List<String>,
@@ -119,4 +78,11 @@ fun cailaGetInference(text: String, apiKey: String): GetIntent {
     val url = "https://app.jaicp.com/cailapub/api/caila/p/$apiKey/nlu/inference?query=$text"
     val response = getRequest(url)
     return Gson().fromJson(response, GetIntent::class.java)
+}
+
+fun main() {
+    val project = exportProject()
+    if (project != null) {
+        importProject(project)
+    }
 }

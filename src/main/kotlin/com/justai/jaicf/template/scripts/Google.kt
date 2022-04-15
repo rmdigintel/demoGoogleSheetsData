@@ -113,9 +113,3 @@ fun updateTagsAndDestination(tags: List<TagPattern>) {
         }
     }
 }
-
-fun main() {
-    val tagsFromGoogleSheets = parseTags("https://sheet2bot.herokuapp.com/api/rows?sheet=$SHEET_ID&range=$RANGE")
-    println(tagsFromGoogleSheets)
-    updateTagsAndDestination(tagsFromGoogleSheets)
-}
