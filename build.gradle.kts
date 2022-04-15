@@ -73,6 +73,10 @@ tasks {
     }
 }
 
+tasks.create("stage") {
+    dependsOn("shadowJar")
+}
+
 tasks.withType<Jar> {
     manifest {
         attributes(
