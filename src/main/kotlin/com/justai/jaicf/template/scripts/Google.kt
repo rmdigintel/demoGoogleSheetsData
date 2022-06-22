@@ -3,13 +3,7 @@ package com.justai.jaicf.template.scripts
 import com.justai.jaicf.template.myCollection
 import com.londogard.nlp.stemmer.Stemmer
 import com.londogard.nlp.utils.LanguageSupport
-import com.mongodb.ConnectionString
-import com.mongodb.MongoClientSettings
-import com.mongodb.client.MongoClient
-import com.mongodb.client.MongoClients
-import com.mongodb.client.MongoCollection
 import com.mongodb.client.model.Filters
-import org.bson.Document
 
 data class TagPattern(
     val name: String,
@@ -36,14 +30,14 @@ fun makePattern(tag: String): String {
         transform = { stemmer.stem(it.trim()) + "*" })
 }
 
-// returns list of pairs of new tags (tag, pattern)
+// returns list of pairs of all tags (tag, pattern)
 // writes them to Global vars
-fun parseTags(url: String): MutableList<TagPattern> {
-    val tagsWithPats = mutableListOf<TagPattern>()
+fun parseTags(url: String): List<TagPattern> {
+    val allTags = mutableListOf<TagPattern>()
     println("----------")
     val response = getRequest(url)
     if (response == "400") {
-        return tagsWithPats
+        return allTags
     }
     // couldn't parse with gson, the data is an array
     val responseParsed = response?.split("],[")
@@ -53,11 +47,11 @@ fun parseTags(url: String): MutableList<TagPattern> {
             for (tagRaw in tags) {
                 val tag = tagRaw.trim().toLowerCase()
                 val foundTagWithCities = findFirstDocument(tag, myCollection)
+                allTags += TagPattern(tag, makePattern(tag))
                 if (foundTagWithCities == null) {
                     //add field in mongo
                     val newDocument = createDocument(tag, arrayListOf<String>(city))
                     myCollection.insertOne(newDocument)
-                    tagsWithPats += TagPattern(tag, makePattern(tag))
                 } else {
                     val destination = foundTagWithCities.getValue("destination") as MutableList<String>
                     if (!destination.contains(city)) {
@@ -69,12 +63,13 @@ fun parseTags(url: String): MutableList<TagPattern> {
             }
         }
     }
-    return (tagsWithPats)
+    return allTags.distinct()
 }
 
-fun updateTagsAndDestination(tags: MutableList<TagPattern>) {
+fun updateTagsAndDestination(tags: List<TagPattern>) {
+    var entityExists = false
     var needToImport = false
-    // check if there are new tags in Google Sheet
+    // check if there are any tags in Google Sheet
     if (tags.isNotEmpty()) {
         println(tags)
         val project = exportProject()
@@ -82,8 +77,9 @@ fun updateTagsAndDestination(tags: MutableList<TagPattern>) {
         if (project != null) {
             println(project)
             val tagsRecordsValues: MutableList<String> = mutableListOf()
-            for (i in 0..project.entities.size) {
+            for (i in 0 until project.entities.size) {
                 if (project.entities[i].entity.name == ENTITY_NAME) {
+                    entityExists = true
                     for (each in project.entities[i].records) {
                         tagsRecordsValues += each.value
                     }
@@ -99,7 +95,19 @@ fun updateTagsAndDestination(tags: MutableList<TagPattern>) {
                     break
                 }
             }
+            if (!entityExists){
+                needToImport = true
+                val newEntity = Entity(0, ENTITY_NAME)
+                val records: MutableList<EntityPattern> = mutableListOf()
+                for (tag in tags){
+                    // check if there is no record for a tag in entity "tags"
+                    val record = createRecord(listOf(tag.pattern), tag.name)
+                    records.add(record)
+                }
+                project.entities.add(EntityWithRecords(newEntity, records))
+            }
             if (needToImport){
+                println("need")
                 importProject(project)
             }
         }

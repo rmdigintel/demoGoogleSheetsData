@@ -7,7 +7,7 @@ import com.justai.jaicf.channel.jaicp.channels.TelephonyChannel
 import com.justai.jaicf.channel.telegram.TelegramChannel
 import com.justai.jaicf.template.accessToken
 import com.justai.jaicf.template.scripts.*
-import com.justai.jaicf.template.templateBot
+import com.justai.jaicf.template.demoBot
 import java.util.*
 import kotlin.concurrent.schedule
 
@@ -19,7 +19,7 @@ fun main() {
         updateTagsAndDestination(tagsFromGoogleSheets)
     }
     JaicpPollingConnector(
-        templateBot,
+        demoBot,
         accessToken,
         channels = listOf(
             ChatApiChannel,

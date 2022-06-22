@@ -14,6 +14,7 @@ typealias CitiesAndAmount = Pair<String, Int>
 val mainScenario = Scenario {
     handle<BotRequestHook> {
         if (!context.session.containsKey("helloMessage")) {
+
             reactions.say("Здравствуйте! Я помогу найти направление по вашему запросу.")
             context.session["helloMessage"] = true
         }
@@ -42,10 +43,7 @@ val mainScenario = Scenario {
         }
         action{
             // get tag from data in entity
-            var tag = activator.caila?.slots?.get("tags")
-            runInTest {
-                tag = getVar("tag") as? String
-            }
+            val tag = activator.caila?.slots?.get("tags")
             // find tag in mongo DB
             val tagWithDestination = findFirstDocument(tag, client.getDatabase("jaicf").getCollection("googleSheets"))
             val destination = if (tagWithDestination != null) tagWithDestination.getValue("destination") as ArrayList<String> else listOf()

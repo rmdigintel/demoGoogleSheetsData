@@ -29,10 +29,10 @@ repositories {
 
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.4.2")
-    //implementation(kotlin("stdlib"))
+
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.2")
     implementation("com.just-ai.jaicf:mongo:$jaicf")
-    implementation ("com.google.code.gson:gson:2.8.9")
+    implementation("com.google.code.gson:gson:2.8.9")
 
     implementation("ch.qos.logback:logback-classic:$logback")
 
@@ -49,7 +49,6 @@ dependencies {
     implementation("com.just-ai.jaicf:caila:$jaicf")
     implementation("com.just-ai.jaicf:telegram:$jaicf")
 
-    //implementation("io.ktor:ktor-server-netty:1.6.7")
     implementation("org.slf4j:slf4j-simple:$slf4j")
     implementation("org.slf4j:slf4j-log4j12:$slf4j")
 
